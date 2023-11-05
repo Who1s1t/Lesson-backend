@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {InjectRepository} from "@nestjs/typeorm";
@@ -33,13 +33,23 @@ export class UserService {
     const token = this.jwtService.sign({id: user.id, email: user.email,firstName: user.firstName,surName: user.surName, lastName: user.lastName,birthday: user.birthday, role: user.role });
     return {token}
   }
+  async update(email:string, updateUserDto:UpdateUserDto) {
+    const user = await this.findByEmail(email)
+    if (!user) throw new NotFoundException("Пользователь не найден!")
+    if (updateUserDto.password)  updateUserDto.password = await argon2.hash(updateUserDto.password)
+    return await this.userRepository.update(user.id, updateUserDto);
+  }
 
-  async findOne(email: string) {
-    return await this.userRepository.findOne({
+
+
+
+  async findByEmail(email: string) {
+    const user =  await this.userRepository.findOne({
       where:{
         email
       }
     })
+    return user
   }
 
 
