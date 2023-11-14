@@ -8,24 +8,26 @@ import {
     UpdateDateColumn
 } from "typeorm";
 import {User} from "../../user/entities/user.entity";
-import {Step} from "./step.entity";
+import {Lesson} from "./lesson.entity";
 
 
-@Entity("lesson")
-export class Lesson {
+@Entity("step")
+export class Step {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    name: string;
+    number: number;
 
-    @ManyToOne(() => User, user => user.lessons)
-    @JoinColumn({name: "user_id"})
-    user: User
+    @Column()
+    text: string;
 
-    @OneToMany(()=>Step, steps => steps.lesson)
-    @JoinTable()
-    steps: Step[]
+    @Column()
+    image: number;
+
+    @ManyToOne(() => Lesson, lesson => lesson.steps)
+    @JoinColumn({name: "lesson_id"})
+    lesson: Lesson
 
     @CreateDateColumn()
     createdDate: Date;

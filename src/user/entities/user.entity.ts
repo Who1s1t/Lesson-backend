@@ -1,4 +1,6 @@
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {Lesson} from "../../lesson/entities/lesson.entity";
+import {JoinTable} from "typeorm";
 
 @Entity("user")
 export class User {
@@ -25,6 +27,10 @@ export class User {
 
     @Column()
     birthday: string;
+
+    @OneToMany(()=>Lesson, lessons => lessons.user)
+    @JoinTable()
+    lessons: Lesson[]
 
 
     @CreateDateColumn()
