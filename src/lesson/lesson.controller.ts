@@ -8,7 +8,7 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
-  ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, UploadedFiles
+  ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, UploadedFiles, UsePipes, ValidationPipe, HttpStatus, Res
 } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
@@ -17,11 +17,12 @@ import {ApiTags} from "@nestjs/swagger";
 import {FileInterceptor, FilesInterceptor} from "@nestjs/platform-express";
 
 @Controller('lesson')
-@ApiTags('')
+@ApiTags('lesson')
 export class LessonController {
   constructor(private readonly lessonService: LessonService) {}
 
-  @Post()
+  @Post("create")
+  @UsePipes(new ValidationPipe())
   @UseInterceptors(FilesInterceptor('files'))
   create(@Body() createLessonDto: CreateLessonDto,@UploadedFiles(
       new ParseFilePipe({
@@ -31,9 +32,9 @@ export class LessonController {
         ],
       }),
   )
-      files: Express.Multer.File) {
-    // return this.lessonService.create(createLessonDto);
-    return files
+      files:   Array<Express.Multer.File>) {
+    return this.lessonService.create(createLessonDto, files);
+
   }
 
   @Get()
@@ -54,5 +55,13 @@ export class LessonController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.lessonService.remove(+id);
+  }
+  @Get('img/:imagename')
+  getImage(@Param('imagename') image: string, @Res() res) {
+    const response = res.sendFile(image, { root: './uploads/img/lesson' });
+    return {
+      status: HttpStatus.OK,
+      data: response,
+    };
   }
 }

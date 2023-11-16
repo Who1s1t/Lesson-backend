@@ -23,7 +23,7 @@ export class Step {
     text: string;
 
     @Column()
-    image: number;
+    image: string;
 
     @ManyToOne(() => Lesson, lesson => lesson.steps)
     @JoinColumn({name: "lesson_id"})
