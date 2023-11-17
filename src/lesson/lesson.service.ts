@@ -24,14 +24,14 @@ export class LessonService {
     })
     const upload = join(__dirname, '..','..','/uploads/img/lesson')
     try {
-
-
-    await access(upload,async err =>
-    {   if (err)
-    {    await mkdir(upload,err =>
-    {   if (err)
-    {   console.log(err)  }
-    });   }
+    await access(upload,async err => {
+      if (err) {
+      await mkdir(upload,{ recursive: true },err => {
+      if (err) {
+        console.log(err)
+      }
+      });
+    }
     });
     }catch (e){
       throw new InternalServerErrorException(`Ошибка создания папки`)
