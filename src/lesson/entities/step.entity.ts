@@ -25,7 +25,9 @@ export class Step {
     @Column()
     image: string;
 
-    @ManyToOne(() => Lesson, lesson => lesson.steps)
+    @ManyToOne(() => Lesson, lesson => lesson.steps,{
+        onDelete: 'CASCADE'
+    })
     @JoinColumn({name: "lesson_id"})
     lesson: Lesson
 

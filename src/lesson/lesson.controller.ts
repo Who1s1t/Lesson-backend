@@ -47,14 +47,32 @@ export class LessonController {
     return this.lessonService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto) {
-    return this.lessonService.update(+id, updateLessonDto);
+
+  @Patch('update/:id')
+  @UsePipes(new ValidationPipe())
+  @UseInterceptors(FileInterceptor('file'))
+  update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto,@UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10000000 }),
+          new FileTypeValidator({ fileType: /image\/(jpeg|png)/}),
+        ],
+        fileIsRequired: false,
+      }),
+  )
+      file: Express.Multer.File) {
+    return this.lessonService.update(+id, updateLessonDto, file);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.lessonService.remove(+id);
+
+  @Delete('remove/:id')
+  removeLesson(@Param('id') id: string) {
+    return this.lessonService.removeLesson(+id);
+  }
+
+  @Delete('remove/step/:id')
+  removeStep(@Param('id') id: string) {
+    return this.lessonService.removeStep(+id);
   }
   @Get('img/:imagename')
   getImage(@Param('imagename') image: string, @Res() res) {
