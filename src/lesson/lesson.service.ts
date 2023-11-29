@@ -7,20 +7,25 @@ import {Repository} from "typeorm";
 import {extname, join} from 'path';
 import {Step} from "./entities/step.entity";
 import {access, mkdir, writeFile} from 'fs';
+import {User} from "../user/entities/user.entity";
 
 @Injectable()
 export class LessonService {
   constructor(
       @InjectRepository(Lesson) private lessonRepository: Repository<Lesson>,
-      @InjectRepository(Step) private stepRepository: Repository<Step>
+      @InjectRepository(Step) private stepRepository: Repository<Step>,
+      @InjectRepository(User) private userRepository: Repository<User>
 
   ) {
   }
 
 
-  async create(createLessonDto: CreateLessonDto, files:  Array<Express.Multer.File>) {
+  async create(createLessonDto: CreateLessonDto, files:  Array<Express.Multer.File>,id) {
     const newLesson = await this.lessonRepository.save({
-      name: createLessonDto.name
+      name: createLessonDto.name,
+      user: id,
+      public: false
+
     })
     const upload = join(__dirname, '..','..','/uploads/img/lesson')
     try {
@@ -125,6 +130,20 @@ export class LessonService {
     }
     await this.lessonRepository.save(lesson)
     return lesson;
+  }
+
+
+  async changePublic(id:number){
+    const lesson = await this.lessonRepository.findOne({
+      where:{
+        id
+      }
+    })
+    if (!lesson) throw new NotFoundException("Урок не найден!");
+    lesson.public = !lesson.public
+    await this.lessonRepository.update(id, lesson)
+    return lesson
+
   }
 
   async removeLesson(id: number) {

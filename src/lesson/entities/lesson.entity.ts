@@ -19,6 +19,9 @@ export class Lesson {
     @Column()
     name: string;
 
+    @Column()
+    public: boolean;
+
     @ManyToOne(() => User, user => user.lessons)
     @JoinColumn({name: "user_id"})
     user: User

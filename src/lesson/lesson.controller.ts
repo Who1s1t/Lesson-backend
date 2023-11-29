@@ -8,13 +8,22 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
-  ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, UploadedFiles, UsePipes, ValidationPipe, HttpStatus, Res
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
+  UploadedFiles,
+  UsePipes,
+  ValidationPipe,
+  HttpStatus,
+  Res,
+  UseGuards, Req
 } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import {ApiTags} from "@nestjs/swagger";
 import {FileInterceptor, FilesInterceptor} from "@nestjs/platform-express";
+import {JwtAuthGuard} from "../auth/guards/jwt-auth.guard";
 
 @Controller('lesson')
 @ApiTags('lesson')
@@ -22,6 +31,7 @@ export class LessonController {
   constructor(private readonly lessonService: LessonService) {}
 
   @Post("create")
+  @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @UseInterceptors(FilesInterceptor('files'))
   create(@Body() createLessonDto: CreateLessonDto,@UploadedFiles(
@@ -32,8 +42,8 @@ export class LessonController {
         ],
       }),
   )
-      files:   Array<Express.Multer.File>) {
-    return this.lessonService.create(createLessonDto, files);
+      files:   Array<Express.Multer.File>,@Req() req) {
+    return this.lessonService.create(createLessonDto, files, +req.user.id);
 
   }
 
@@ -64,6 +74,11 @@ export class LessonController {
     return this.lessonService.update(+id, updateLessonDto, file);
   }
 
+  @Patch('change_public/:id')
+  @UsePipes(new ValidationPipe())
+  changePublic(@Param('id') id: string,) {
+    return this.lessonService.changePublic(+id);
+  }
 
   @Delete('remove/:id')
   removeLesson(@Param('id') id: string) {
