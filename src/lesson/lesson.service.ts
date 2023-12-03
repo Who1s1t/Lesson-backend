@@ -86,6 +86,29 @@ export class LessonService {
     }) ;
   }
 
+  async findAllPublic() {
+    return await this.lessonRepository.find({
+      where:{
+          public: true
+      },
+      relations:{
+        steps: true
+      }
+    }) ;
+  }
+
+  async findAllNotPublic() {
+    return await this.lessonRepository.find({
+      where:{
+        public: false
+    },
+      relations:{
+        steps: true
+      }
+    }) ;
+  }
+
+
   async findOne(id: number) {
     const lesson = await this.lessonRepository.findOne({
       where:{

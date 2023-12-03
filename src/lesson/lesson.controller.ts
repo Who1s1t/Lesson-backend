@@ -52,6 +52,16 @@ export class LessonController {
     return this.lessonService.findAll();
   }
 
+  @Get('public')
+  findAllNotPublic() {
+    return this.lessonService.findAllNotPublic();
+  }
+
+  @Get('not_public')
+  findAllPublic() {
+    return this.lessonService.findAllPublic();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.lessonService.findOne(+id);
