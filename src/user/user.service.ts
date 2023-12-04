@@ -36,12 +36,15 @@ export class UserService {
   async update(email:string, updateUserDto:UpdateUserDto,role:string) {
     const user = await this.findByEmail(email)
     if (!user) throw new NotFoundException("Пользователь не найден!")
-    const existUser = await this.userRepository.findOne({
-      where: {
-        email: updateUserDto.email,
-      }
-    })
-    if(existUser) throw new BadRequestException('Пользователь с таким Email уже существует!')
+    if (updateUserDto.email){
+      const existUser = await this.userRepository.findOne({
+        where: {
+          email: updateUserDto.email,
+        }
+      })
+      if(existUser) throw new BadRequestException('Пользователь с таким Email уже существует!')
+    }
+
     if (updateUserDto.password)  updateUserDto.password = await argon2.hash(updateUserDto.password)
     if (updateUserDto.role){
       if (role != "admin"){
