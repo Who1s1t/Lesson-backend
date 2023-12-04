@@ -33,10 +33,21 @@ export class UserService {
     const token = this.jwtService.sign({id: user.id, email: user.email,firstName: user.firstName,surName: user.surName, lastName: user.lastName,birthday: user.birthday, role: user.role });
     return {token}
   }
-  async update(email:string, updateUserDto:UpdateUserDto) {
+  async update(email:string, updateUserDto:UpdateUserDto,role:string) {
     const user = await this.findByEmail(email)
     if (!user) throw new NotFoundException("Пользователь не найден!")
+    const existUser = await this.userRepository.findOne({
+      where: {
+        email: updateUserDto.email,
+      }
+    })
+    if(existUser) throw new BadRequestException('Пользователь с таким Email уже существует!')
     if (updateUserDto.password)  updateUserDto.password = await argon2.hash(updateUserDto.password)
+    if (updateUserDto.role){
+      if (role != "admin"){
+        updateUserDto.role = user.role
+      }
+    }
     return await this.userRepository.update(user.id, updateUserDto);
   }
 

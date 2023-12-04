@@ -24,6 +24,8 @@ import { UpdateLessonDto } from './dto/update-lesson.dto';
 import {ApiTags} from "@nestjs/swagger";
 import {FileInterceptor, FilesInterceptor} from "@nestjs/platform-express";
 import {JwtAuthGuard} from "../auth/guards/jwt-auth.guard";
+import {AuthorGuard} from "../guard/author.guard";
+import {ModerGuard} from "../guard/moder.guard";
 
 @Controller('lesson')
 @ApiTags('lesson')
@@ -48,16 +50,18 @@ export class LessonController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard,ModerGuard)
   findAll() {
     return this.lessonService.findAll();
   }
 
-  @Get('public')
+  @Get('not_public')
+  @UseGuards(JwtAuthGuard,ModerGuard)
   findAllNotPublic() {
     return this.lessonService.findAllNotPublic();
   }
 
-  @Get('not_public')
+  @Get('public')
   findAllPublic() {
     return this.lessonService.findAllPublic();
   }
@@ -69,6 +73,7 @@ export class LessonController {
 
 
   @Patch('update/:id')
+  @UseGuards(JwtAuthGuard,AuthorGuard)
   @UsePipes(new ValidationPipe())
   @UseInterceptors(FileInterceptor('file'))
   update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto,@UploadedFile(
@@ -85,17 +90,20 @@ export class LessonController {
   }
 
   @Patch('change_public/:id')
+  @UseGuards(JwtAuthGuard,ModerGuard)
   @UsePipes(new ValidationPipe())
   changePublic(@Param('id') id: string,) {
     return this.lessonService.changePublic(+id);
   }
 
   @Delete('remove/:id')
+  @UseGuards(JwtAuthGuard,AuthorGuard)
   removeLesson(@Param('id') id: string) {
     return this.lessonService.removeLesson(+id);
   }
 
   @Delete('remove/step/:id')
+  @UseGuards(JwtAuthGuard,AuthorGuard)
   removeStep(@Param('id') id: string) {
     return this.lessonService.removeStep(+id);
   }

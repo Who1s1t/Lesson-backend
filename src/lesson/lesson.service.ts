@@ -115,7 +115,8 @@ export class LessonService {
         id
       },
       relations:{
-        steps: true
+        steps: true,
+        user: true,
       }
     })
     if (!lesson) throw new NotFoundException("Урок не найден!")
